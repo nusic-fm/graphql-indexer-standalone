@@ -1,0 +1,23 @@
+runtime: nodejs16 # Use the Node.js 14 runtime
+service: graphql-indexer
+# instance_class: F2 # Adjust the instance class based on your needs
+
+env_variables:
+  # Set any environment variables your application needs
+  # For example:
+  NODE_ENV: production
+  PORT: 8080 # The port your Node.js app is listening on
+  MONGODB_USR: logesh
+  MONGODB_PWD: RvgwBTKZ5T3qRJ6
+  MORALIS_API_KEY: MtgBtZRVV4eVtlljDrZWidZOGj9l2DtoE1wOyAm2feg0s6IfUvL4x0xaq7ZNqxig
+# automatic_scaling:
+#   target_cpu_utilization: 0.65 # Adjust based on your application's needs
+#   min_instances: 1
+#   max_instances: 5 # Adjust based on your application's needs
+
+# handlers:
+#   - url: /.*
+#     script: auto
+
+# Specify the command to start your Node.js app with npm run prod
+# entrypoint: npm run prod

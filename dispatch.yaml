@@ -1,0 +1,5 @@
+dispatch:
+- url: "www.graphql.indexer.api.nusic.fm/*"
+  service: graphql-indexer
+- url: "graphql.indexer.api.nusic.fm/*"
+  service: graphql-indexer

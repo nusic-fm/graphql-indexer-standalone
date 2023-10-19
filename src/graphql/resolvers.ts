@@ -22,7 +22,8 @@ type TokensInput = {
 };
 
 type WhereCollectionFilter = {
-  genre: string;
+  genre?: string;
+  collectionAddress?: string[];
 };
 
 type CollectionsInput = {
@@ -54,11 +55,17 @@ const resolvers = {
         queries.push({ $match: { _id: { $gt: lastUser._id } } });
       }
       if (where) {
-        const { genre } = where;
+        const { genre, collectionAddress } = where;
         if (genre) {
           queries.push({
             $match: { "token.metadata.genre": getGenreName(genre) },
           });
+        }
+        if (collectionAddress && collectionAddress.length) {
+          const addrs = collectionAddress.filter((v, i, array) => array.indexOf(v) === i);
+          queries.push({
+            $match: {"collectionAddress": {$in: addrs}}
+          })
         }
       }
       queries.push(

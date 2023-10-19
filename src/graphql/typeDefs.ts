@@ -65,6 +65,7 @@ input TokensWhereFilter {
 }
 input CollectionWhereFilter {
   genre: GenreTypes
+  collectionAddress: [String]
 }
   # input TokenInput {
   #   name: String

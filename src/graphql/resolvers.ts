@@ -21,9 +21,11 @@ type TokensInput = {
   where?: WhereTokensFilter;
 };
 
-type WhereCollectionFilter = {
+type CollectionWhereFilter = {
   genre?: string;
   collectionAddress?: string[];
+  platform?: "soundxyz";
+  
 };
 
 type CollectionsInput = {
@@ -31,7 +33,7 @@ type CollectionsInput = {
     after?: string | null;
     limit?: number | null;
   };
-  where?: WhereCollectionFilter;
+  where?: CollectionWhereFilter;
 };
 
 const resolvers = {
@@ -55,10 +57,17 @@ const resolvers = {
         queries.push({ $match: { _id: { $gt: lastUser._id } } });
       }
       if (where) {
-        const { genre, collectionAddress } = where;
+        const { genre, collectionAddress, platform } = where;
         if (genre) {
           queries.push({
             $match: { "token.metadata.genre": getGenreName(genre) },
+          });
+        }
+        if (platform) {
+          queries.push({
+            $match: { "token.metadata.external_url": {
+              $regex: /^https:\/\/www\.sound\.xyz/
+            } },
           });
         }
         if (collectionAddress && collectionAddress.length) {
@@ -75,6 +84,9 @@ const resolvers = {
             collectionAddress: { $first: "$collectionAddress" },
             id: { $first: "$_id" },
           },
+        },
+        {
+          $sort: {collectionAddress: 1}
         },
         { $project: { _id: 0, collectionAddress: 1, id: 1 } },
         // { $skip: skip },

@@ -11,6 +11,7 @@ type TokenDoc {
   tokenStandard: String,
   tokenUrl: String,
   owner: String,
+  mintInfo: MintInfo
 }
 type NftMetadata {
   image: String
@@ -20,6 +21,31 @@ type NftMetadata {
   artist: String
   bpm: String
   duration: String
+}
+type MintInfo {
+  originatorAddress: String
+  price: MintPriceInfo
+  toAddress: String
+  mintContext: MintContext
+}
+type MintPriceInfo {
+  blockNumber: Int
+  chainTokenPrice: ChainTokenPrice
+}
+type ChainTokenPrice {
+  raw: String
+  decimal: Float
+  currency: Currency
+}
+type Currency {
+  address: String
+  decimal: Int
+  name: String
+}
+type MintContext {
+  blockNumber: Int
+  transactionHash: String
+  blockTimestamp: String
 }
 type TransactionInfo {
     blockNumber: String
@@ -58,14 +84,18 @@ enum GenreTypes {
   Soundtrack
   Triphop
 }
+enum PlatformOptions {
+  soundxyz
+}
 input TokensWhereFilter {
   collectionAddress: String
   tokens: WhereTokenFilter
   genre: GenreTypes
 }
-input CollectionWhereFilter {
+input CollectionWhereFilterDef {
   genre: GenreTypes
   collectionAddress: [String]
+  platform: PlatformOptions
 }
   # input TokenInput {
   #   name: String
@@ -87,7 +117,7 @@ type Token {
   type Query {
     token(ID: ID!): Token!
     tokens(paging: Paging, where: TokensWhereFilter): Token!
-    collections(paging: Paging, where: CollectionWhereFilter): Token!
+    collections(paging: Paging, where: CollectionWhereFilterDef): Token!
   }
 
   # type Mutation {

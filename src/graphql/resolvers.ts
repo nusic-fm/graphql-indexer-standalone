@@ -1,5 +1,7 @@
 import { fromGlobalId, toGlobalId } from "graphql-relay";
+import Artist from "../models/Artist.js";
 import Token from "../models/Token.js";
+import Track from "../models/Track.js";
 import { getGenreName, paginateTokens } from "./utils.js";
 
 export type WhereTokensFilter = {
@@ -35,6 +37,33 @@ type CollectionsInput = {
   };
   where?: CollectionWhereFilter;
 };
+
+type TracksInput = {
+  paging?: {
+    after?: string | null;
+    limit?: number | null;
+  };
+  where?: {
+    platformId?: string;
+    address?: string;
+    name?: string;
+    // chainId?: string;
+    // symbol?: string;
+    // startingBlock?: string;
+    standard?: string;
+    artistId?: string;
+    // artistId?: string;
+  }
+}
+type ArtistsInput = {
+  paging?: {
+    after?: string | null;
+    limit?: number | null;
+  };
+  where?: {
+    artistIds?: string[];
+  }
+}
 
 const resolvers = {
   Query: {
@@ -115,6 +144,66 @@ const resolvers = {
         },
       };
     },
+    async tracks(_, { paging, where }: TracksInput) {
+      const { after, limit } = paging ?? { after: null, limit: 10 };
+      const _limit = limit > 100 ? 100 : limit;
+      let query = {};
+
+      // Build the MongoDB query based on the provided 'where' conditions
+      if (where) {
+        query = { ...where };
+      }
+
+      // If 'after' is provided, use it as the starting point for pagination
+      if (after) {
+        const lastUser = await Token.findById(fromGlobalId(after).id);
+        query["_id"] = { $gt: lastUser._id };
+      }
+
+      const results = await Track.find(query).limit(_limit);
+
+      // Check if there are more items beyond the current result set
+      const totalItems = await Track.countDocuments(query);
+      const hasNextPage = totalItems > _limit + results.length;
+      const endCursor = results.length > 0 ? toGlobalId("User", results[results.length - 1].id) : null;
+
+      return {
+        nodes: results,
+        pageInfo: {
+          hasNextPage,
+          endCursor,
+        },
+      };
+    },
+    async artists(_, { paging, where }: ArtistsInput) {
+      const { after, limit } = paging ?? { after: null, limit: 10 };
+      const _limit = limit > 100 ? 100 : limit;
+      let query = {};
+      if (where) {
+        const {artistIds} = where;
+        query["userId"] = { $in: artistIds.map(id => id.split('/')[1]) };
+      }
+      // If 'after' is provided, use it as the starting point for pagination
+      if (after) {
+        const lastUser = await Token.findById(fromGlobalId(after).id);
+        query["_id"] = { $gt: lastUser._id };
+      }
+
+      // Fetch records from UserModel based on artistIds
+      const results = await Artist.find(query).limit(_limit);
+      // Check if there are more items beyond the current result set
+      const totalItems = await Track.countDocuments(query);
+      const hasNextPage = totalItems > _limit + results.length;
+      const endCursor = results.length > 0 ? toGlobalId("User", results[results.length - 1].id) : null;
+      
+      return {
+        nodes: results,
+        pageInfo: {
+          hasNextPage,
+          endCursor,
+        },
+      };
+    }
   },
   // Mutation: {
   //   async createToken(_, { token: { name, address, tokenId } }) {

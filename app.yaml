@@ -1,4 +1,4 @@
-runtime: nodejs16 # Use the Node.js 14 runtime
+runtime: nodejs18
 service: graphql-indexer
 # instance_class: F2 # Adjust the instance class based on your needs
 

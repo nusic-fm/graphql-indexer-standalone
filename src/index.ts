@@ -27,7 +27,9 @@ const server = new ApolloServer({
     // Install a landing page plugin based on NODE_ENV
     process.env.NODE_ENV === "production"
       ? ApolloServerPluginLandingPageProductionDefault({
-          graphRef: "logeshs-team-68oqfq@main",
+          // graphRef: "logeshs-team-68oqfq@main",
+          // graphRef: "NUSIC-Test-79exlti@current", // Change this to reflect the changes on prod
+          graphRef: "NUSIC-Test-79exlti@current", // Change this to reflect the changes on prod/
           footer: false,
         })
       : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
